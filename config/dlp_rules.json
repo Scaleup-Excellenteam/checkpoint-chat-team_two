@@ -1,0 +1,21 @@
+{
+  "rules": [
+    {
+      "id": "pii_ssn",
+      "pattern": "\\b\\d{3}-\\d{2}-\\d{4}\\b",
+      "category": "PII",
+      "action": "redact",
+      "replacement": "[REDACTED-SSN]"
+    },
+    {
+      "id": "secret_recipe",
+      "keywords": ["secret recipe", "confidential"],
+      "category": "CONFIDENTIAL",
+      "action": "block"
+    }
+  ],
+  "room_policies": {
+    "lobby": ["PII"],
+    "secret-ops": ["PII", "CONFIDENTIAL"]
+  }
+}

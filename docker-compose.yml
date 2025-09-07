@@ -1,19 +1,19 @@
 services:
   server:
     build: ./server
-    ports: ["8090:8090"]
+    ports: ["8080:8080"]
     healthcheck:
-      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8090/health'); print('ok')\""]
+      test: ["CMD-SHELL", "python - <<'PY'\nimport urllib.request,sys\ntry:\n urllib.request.urlopen('http://localhost:8080/health', timeout=2)\n print('ok')\nexcept Exception as e:\n print(e); sys.exit(1)\nPY"]
       interval: 5s
-      timeout: 2s
+      timeout: 3s
       retries: 20
 
   client:
-    build: ./client              # Dockerfile שמריץ interactive_client.py
-    stdin_open: true             # אינטראקטיבי
+    build: ./client
+    stdin_open: true
     tty: true
     environment:
-      SERVER_URL: ws://server:8090/ws
+      SERVER_URL: ws://server:8080/ws
     depends_on:
       server:
         condition: service_healthy
