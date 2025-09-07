@@ -1,11 +1,9 @@
-version: "3.9"
-
 services:
   server:
     build: ./server
-    ports: ["8080:8080"]
+    ports: ["8090:8090"]
     healthcheck:
-      test: ["CMD", "curl", "-fsS", "http://localhost:8080/health"]
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8090/health'); print('ok')\""]
       interval: 5s
       timeout: 2s
       retries: 20
@@ -15,7 +13,7 @@ services:
     stdin_open: true             # אינטראקטיבי
     tty: true
     environment:
-      SERVER_URL: ws://server:8080/ws
+      SERVER_URL: ws://server:8090/ws
     depends_on:
       server:
         condition: service_healthy

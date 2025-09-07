@@ -8,6 +8,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 # העתקת הקוד
 COPY app.py .
 
-EXPOSE 8080
+EXPOSE 8090
 # ברירת מחדל להרצה
 CMD ["python", "app.py"]
