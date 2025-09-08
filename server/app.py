@@ -8,8 +8,8 @@ from logging_config import setup_logging
 
 # The message pipeline with DLP integration
 try:
-    from message_pipline import MessagePipeline, ValidationHandler, DLPMessageHandler
-    from security.dlp_handler import DLPHandler
+    from message_pipline import MessagePipeline, ValidationHandler
+    from security.dlp_handler import DLPHandler, DLPMessageHandler
 except Exception:  # keep tests green even if pipeline module changes/missing
     MessagePipeline = None  # type: ignore
     DLPHandler = None  # type: ignore

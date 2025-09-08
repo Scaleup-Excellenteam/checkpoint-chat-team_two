@@ -2,10 +2,6 @@ from abc import ABC, abstractmethod
 from typing import Optional, Dict, Any
 import re
 import json
-try: # TODO: Fix circular import
-    from security.dlp_handler import DLPHandler
-except ImportError:
-    DLPHandler = None # Placeholder if DLPHandler is not available
     
 # Responsible for processing messages through various handlers
 
@@ -29,29 +25,6 @@ class ValidationHandler(MessageHandler):
             # TODO: Block the message entirely
             return None
         
-        return message
-
-class DLPMessageHandler(MessageHandler):
-    def __init__(self, dlp_handler: DLPHandler, use_gemini: bool = False):
-        self.dlp_handler = dlp_handler
-        self.use_gemini = use_gemini
-    
-    async def process(self, message, context):
-        if self.use_gemini:
-            processed_text, is_blocked = await self.dlp_handler.check_message_async(
-                message['text'], 
-                message['room']
-            )
-        else:
-            processed_text, is_blocked = self.dlp_handler.check_message(
-                message['text'], 
-                message['room']
-            )
-        
-        if is_blocked:
-            return None
-        
-        message['text'] = processed_text
         return message
 
 class MessagePipeline:

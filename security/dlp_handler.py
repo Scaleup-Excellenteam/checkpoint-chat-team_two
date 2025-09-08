@@ -3,6 +3,7 @@ import json
 import asyncio
 import aiohttp
 from typing import Dict, List, Optional
+from message_pipline import MessageHandler
 
 # Responsible for Data Loss Prevention (DLP) handling, URL filtering, and redaction
 
@@ -112,3 +113,29 @@ class DLPHandler:
         except Exception as e:
             print(f"Gemini API error: {e}")
             return "ALLOW"  # Default to allow on API failure
+
+class DLPMessageHandler(MessageHandler):
+    def __init__(self, dlp_handler: 'DLPHandler', use_gemini: bool = False):
+        self.dlp_handler = dlp_handler
+        self.use_gemini = use_gemini
+    
+    async def process(self, message, context):
+        print(f"DLPMessageHandler: Processing message: {message}")
+        if self.use_gemini:
+            processed_text, is_blocked = await self.dlp_handler.check_message_async(
+                message['text'], 
+                message['room']
+            )
+        else:
+            processed_text, is_blocked = self.dlp_handler.check_message(
+                message['text'], 
+                message['room']
+            )
+        
+        print(f"DLPMessageHandler: is_blocked={is_blocked}, text='{message['text']}'")
+        if is_blocked:
+            print(f"DLPMessageHandler: BLOCKING message")
+            return None
+        
+        message['text'] = processed_text
+        return message

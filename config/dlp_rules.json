@@ -35,10 +35,12 @@
     "production date",
     "expiration date",
     "supplier information",
-    "pineapple"
+    "pineapple",
+    "bake"
+    
   ],
   "suspicious_indicators": [
-    "recipe", "ingredient", "cook", "bake", "mix", "blend", "sauce", "spice",
+    "recipe", "ingredient", "cook", "mix", "blend", "sauce", "spice",
     "temperature", "time", "process", "method", "technique", "formula",
     "secret", "confidential", "proprietary", "special", "signature",
     "preparation", "ferment", "age", "marinate", "season"
