@@ -89,3 +89,8 @@ To run the project tests, ensure you have a `pytest.ini` file that sets the Pyth
 ```bash
 pytest -q
 ```
+
+
+netsh interface portproxy add v4tov4 listenaddress=127.0.0.1 listenport=8099 connectaddress=172.20.10.13 connectport=8080
+docker compose run --rm --no-deps -e SERVER_URL=ws://host.docker.internal:8099/ws -e NAME=Lior client
+python client/interactive_client.py --url ws://172.20.10.11:8080/ws --nick Lior

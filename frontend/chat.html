@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Chat</title>
+  <link rel="stylesheet" href="chat.css" />
+</head>
+<body>
+  <div class="app">
+    <header>
+      <h1 id="title">TSPO Chat</h1>
+      <div class="conn">
+        <span id="userDisplay" class="status">👤</span>
+        <span id="status" class="status">Disconnected</span>
+      </div>
+    </header>
+
+    <main>
+      <ul id="messages"></ul>
+    </main>
+
+    <footer>
+      <input id="input" placeholder="Type a message…" disabled />
+      <button id="sendBtn" type="button" disabled>Send</button>
+    </footer>
+  </div>
+
+  <!-- Optional: centralize your API/WS base -->
+  <!-- <script>window.WS_BASE = "ws://localhost:8080";</script> -->
+  <!-- <script src="config.js"></script> -->
+  <script src="chat.js"></script>
+</body>
+</html>

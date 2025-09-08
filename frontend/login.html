@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sign in</title>
+  <link rel="stylesheet" href="login.css" />
+</head>
+<body>
+  <div class="toast" id="toast"></div>
+
+  <main class="container">
+    <section class="card">
+      <header class="header">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <h1 class="h1">Welcome</h1>
+          <p class="muted">Sign in to continue to the team chat</p>
+        </div>
+      </header>
+
+      <form id="loginForm" class="form" novalidate>
+        <div>
+          <label class="label" for="nickname">Nickname</label>
+          <input
+            class="input"
+            id="nickname"
+            name="nickname"
+            type="text"
+            placeholder="Your nickname"
+            minlength="2"
+            required
+          />
+          <div class="helper" id="nicknameHelp"></div>
+        </div>
+
+        <div>
+          <label class="label" for="password">Password</label>
+          <input
+            class="input"
+            id="password"
+            name="password"
+            type="password"
+            placeholder="••••••••"
+            minlength="4"
+            required
+          />
+          <div class="helper" id="passwordHelp"></div>
+        </div>
+
+        <button type="submit" class="btn" id="loginBtn">Sign in</button>
+        <div class="hr"></div>
+        <div class="helper">
+          Don't have an account? <a class="link" href="register.html">Sign up</a>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <!-- Optional: expose API_BASE from a single place -->
+  <script>
+    // window.API_BASE = "http://localhost:8080"; // uncomment or set in config.js
+  </script>
+  <!-- If you use a shared config, load it before login.js -->
+  <!-- <script src="config.js"></script> -->
+  <script defer src="login.js"></script>
+</body>
+</html>

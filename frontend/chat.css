@@ -1,0 +1,109 @@
+/* Light theme to match login/register — comments in English */
+:root{
+  --bg:#f5f7fb;            /* page background */
+  --panel:#ffffff;          /* card/panel background */
+  --text:#0f172a;           /* primary text */
+  --muted:#64748b;          /* secondary text */
+  --accent:#0ea5e9;         /* sky-500 */
+  --border:rgba(15,23,42,.10);
+  --ring:rgba(14,165,233,.25);
+  --chip:#eef6ff;           /* light bubble bg */
+  --chip-me:#eaf0ff;        /* light bubble bg (me) */
+  --shadow:0 10px 26px rgba(2,6,23,.06), 0 2px 6px rgba(2,6,23,.05);
+}
+
+*{ box-sizing:border-box; }
+html,body{ height:100%; }
+body{
+  margin:0; background: var(--bg); color: var(--text);
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+  /* subtle radial accents like login/register */
+  background:
+    radial-gradient(1000px 700px at 90% -10%, rgba(139,92,246,.08), transparent),
+    radial-gradient(900px 600px at -10% 120%, rgba(14,165,233,.08), transparent),
+    var(--bg);
+}
+
+.app{ max-width: 820px; margin: 24px auto; padding: 16px; }
+
+header{
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:12px;
+}
+h1{ margin:0; font-size:22px; }
+.conn{ display:flex; gap:8px; align-items:center; }
+.status{ font-size:12px; color: var(--muted); }
+
+main{
+  margin:16px 0;
+  border:1px solid var(--border);
+  background: var(--panel);
+  border-radius: 16px;
+  padding: 10px;
+  height: 55vh;
+  overflow:auto;
+  box-shadow: var(--shadow);
+}
+
+#messages{
+  list-style:none; margin:0; padding:0;
+  display:flex; flex-direction:column; gap:8px;
+}
+
+/* Chat bubbles */
+.msg{
+  background: var(--chip);
+  padding:10px 12px;
+  border-radius: 14px;
+  border:1px solid rgba(15,23,42,.06);
+  box-shadow: 0 1px 0 rgba(2,6,23,.04);
+}
+.msg.me{
+  background: var(--chip-me);
+  border-color: rgba(14,165,233,.22);
+}
+.msg small{ color: var(--muted); margin-inline-start: 8px; }
+
+/* Composer */
+footer{
+  display:grid; grid-template-columns: 1fr 120px; gap: 8px;
+}
+input, button{
+  border-radius: 12px;
+  border:1px solid var(--border);
+  background:#ffffff;
+  color: var(--text);
+  padding: 10px 12px;
+  outline: none;
+  transition: border-color .15s, box-shadow .15s, background .15s;
+}
+input::placeholder{ color:#94a3b8; }
+input:focus{
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px var(--ring);
+  background:#fff;
+}
+
+button{
+  cursor:pointer;
+  background: linear-gradient(135deg, var(--accent), #8b5cf6);
+  color:#ffffff; font-weight:700;
+  border-color: transparent;
+  box-shadow: 0 6px 16px rgba(14,165,233,.20);
+}
+button:disabled, input:disabled{ opacity:.6; cursor:not-allowed; }
+
+/* Nice scrollbar (WebKit) */
+main::-webkit-scrollbar{ height:12px; width:12px; }
+main::-webkit-scrollbar-thumb{
+  background: rgba(2,6,23,.15);
+  border-radius: 10px;
+  border: 3px solid var(--panel);
+}
+main::-webkit-scrollbar-track{ background: transparent; }
+
+/* Responsive tweak */
+@media (max-width: 560px){
+  footer{ grid-template-columns: 1fr auto; }
+  button{ padding-inline: 14px; }
+}
