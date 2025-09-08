@@ -55,7 +55,7 @@ class ChatServer:
         """Accepts a client, processes commands silently, broadcasts chat messages."""
         await websocket.accept()
         room = settings.default_room
-        setattr(websocket, "nick", "anon")
+        setattr(websocket, "nick", "Bean")
         setattr(websocket, "showall", False)
 
         # Join default room without sending any system echo
@@ -71,7 +71,7 @@ class ChatServer:
                 # ---- Commands (NO echo back) ----
                 if text.startswith("/nick "):
                     new_nick = text.split(" ", 1)[1].strip()
-                    websocket.nick = new_nick or "anon"
+                    websocket.nick = new_nick or "Bean"
                     continue
 
                 if text.startswith("/join "):
