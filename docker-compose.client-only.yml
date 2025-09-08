@@ -1,0 +1,7 @@
+services:
+  client:
+    build: ./client
+    stdin_open: true
+    tty: true
+    environment:
+      SERVER_URL: ws://172.20.10.13:8080/ws

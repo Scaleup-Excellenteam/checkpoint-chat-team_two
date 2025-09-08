@@ -1,92 +1,130 @@
-# Dockerized FastAPI WebSocket Chat 
-
-Dockerized FastAPI WebSocket chat; migrated to Pydantic v2 via pydantic-settings, fixed imports, unified port 8080, full server copied to image, healthcheck + tests.
-
------
+# Chat Application - How to Run
 
 ## Prerequisites
 
-  * **Docker:** Ensure Docker is installed and running on your system.
-  * **Python 3.8+ & Poetry:** Required for the local Python client and for running tests.
-  * **Windows PowerShell:** Required for the proxy setup if you need to connect to an external server.
+1. **Python 3.11+** installed
+2. **Required packages** installed:
+   ```bash
+   pip install fastapi uvicorn websockets aiohttp pydantic-settings
+   ```
 
------
+## Running the Server
 
-## Quick Start (Local Server)
-
-1.  **Build and run the server:**
-
-    ```bash
-    docker compose build --no-cache
-    docker compose up -d server
-    ```
-
-2.  **Verify server health:**
-
-    ```bash
-    curl http://localhost:8080/health
-    # Expected output: {"status":"healthy"}
-    ```
-
-3.  **Connect clients:**
-
-      * **Docker Client:**
-        ```bash
-        docker compose run --rm client
-        ```
-      * **Local Python Client:**
-        ```bash
-        poetry install
-        poetry run python client/client.py
-        ```
-
-    Messages sent from either client will appear in both terminals.
-
------
-
-## Connecting to an External Server (via Proxy)
-
-To connect the Dockerized client to a server running on a different machine (e.g., `172.20.10.11:8090`), a local proxy is used to forward requests.
-
-1.  **Create a local proxy:**
-    Run the `proxy_simple.ps1` script from PowerShell, replacing `TargetAddress` and `TargetPort` with your server's details. `ListenPort` is the local port the proxy will use.
-
-    ```powershell
-    .\proxy_simple.ps1 -TargetAddress 172.20.10.13 -TargetPort 8080 -ListenPort 8099 -Action add
-    ```
-
-2.  **Verify the proxy connection:**
-
-    ```bash
-    curl http://127.0.0.1:8099/health
-    # A successful response from the remote server will look like:
-    # {"status":"ok","total_clients":1,"rooms":["lobby"]}
-    ```
-
-3.  **Run the client via the proxy:**
-    Connect the Docker client to the local proxy using `host.docker.internal`.
-
-    ```bash
-    docker compose run --rm --no-deps `
-      -e SERVER_URL=ws://host.docker.internal:8099/ws `
-      -e NAME=Lior `
-      client
-    ```
-
-4.  **Remove the proxy:**
-    When finished, clean up the proxy rule with the following command:
-
-    ```powershell
-    .\proxy_simple.ps1 -ListenPort 8099 -Action remove
-    ```
-
------
-
-## Running Tests
-
-To run the project tests, ensure you have a `pytest.ini` file that sets the Python path correctly.
-
+### Option 1: Direct Python (Recommended)
 ```bash
-pytest -q
+# Navigate to project root
+cd checkpoint-chat-team_two
+
+# Set Python path and run server
+set PYTHONPATH=%CD%
+python -c "import sys; sys.path.append('.'); sys.path.append('server'); import uvicorn; uvicorn.run('server.app:app', host='0.0.0.0', port=8080)"
 ```
 
+### Option 2: Using uvicorn directly
+```bash
+cd checkpoint-chat-team_two
+set PYTHONPATH=%CD%
+python -m uvicorn server.app:app --host 0.0.0.0 --port 8080
+```
+
+### Option 3: Docker Compose (Full Stack)
+```bash
+docker compose up
+```
+
+## Running the Client
+
+### Option 1: Python Client (Recommended)
+```bash
+# Navigate to client directory
+cd client
+
+# Install dependencies
+pip install websockets asyncio
+
+# Run client (replace IP with server IP)
+python interactive_client.py --url ws://SERVER_IP:8080/ws --nick YourName --room lobby
+```
+
+### Option 2: Docker Client Only
+```bash
+# Build client image
+docker build -t chat-client ./client
+
+# Run client (replace IP with server IP)
+docker run -it --rm -e SERVER_URL=ws://SERVER_IP:8080/ws chat-client
+```
+
+## Configuration
+
+### Environment Variables
+Copy `.env.example` to `.env` and modify as needed:
+```bash
+cp .env.example .env
+```
+
+Key settings:
+- `HOST=0.0.0.0` (for external connections)
+- `PORT=8080`
+- `DEFAULT_ROOM=lobby`
+- `ENABLE_DLP=false` (set to true for content filtering)
+
+## Testing Connection
+
+Use the connection test script:
+```bash
+python test_connection.py ws://SERVER_IP:8080/ws
+```
+
+## Troubleshooting
+
+### Server Issues
+1. **Port already in use**: Change port in `.env` file or use different port
+2. **Import errors**: Make sure `PYTHONPATH` is set correctly
+3. **Permission denied**: Run as administrator or use different port
+
+### Client Connection Issues
+1. **Connection refused**: 
+   - Check if server is running
+   - Verify IP address and port
+   - Check Windows Firewall settings
+2. **Wrong IP**: Use `ipconfig` to find correct IP address
+
+### Network Setup
+1. **Find your IP address**:
+   ```bash
+   ipconfig
+   ```
+   Look for "IPv4 Address" under your active network adapter
+
+2. **Allow through Windows Firewall**:
+   - Go to Windows Defender Firewall
+   - Allow Python through firewall
+   - Or temporarily disable firewall for testing
+
+## Example Usage
+
+1. **Start server** on computer A:
+   ```bash
+   python -c "import sys; sys.path.append('.'); sys.path.append('server'); import uvicorn; uvicorn.run('server.app:app', host='0.0.0.0', port=8080)"
+   ```
+
+2. **Connect client** from computer B:
+   ```bash
+   python interactive_client.py --url ws://COMPUTER_A_IP:8080/ws --nick Alice --room lobby
+   ```
+
+3. **Chat commands**:
+   - `/nick NewName` - Change nickname
+   - `/join RoomName` - Join different room
+   - `/showall on/off` - Toggle message visibility
+   - Type normally to send messages
+
+## Health Check
+
+Test if server is running:
+```bash
+curl http://SERVER_IP:8080/health
+```
+
+Should return: `{"status":"ok"}`

@@ -3,11 +3,13 @@ import time
 import pytest
 from contextlib import ExitStack
 from fastapi.testclient import TestClient
-from server.app import app
-from server.message_pipline import MessagePipeline, ValidationHandler
+
+# App & pipeline
+from app import app
+from message_pipline import MessagePipeline, ValidationHandler
 
 # Configurable delay (seconds) between messages in the sequential 20-clients test
-MESSAGE_DELAY_SECONDS = float(os.getenv("E2E_MSG_DELAY", "0.05"))
+MESSAGE_DELAY_SECONDS = float(os.getenv("E2E_MSG_DELAY", "0.5"))
 
 
 # ---------------------------

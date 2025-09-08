@@ -2,8 +2,11 @@ from abc import ABC, abstractmethod
 from typing import Optional, Dict, Any
 import re
 import json
-from security.dlp_handler import DLPHandler
-
+try: # TODO: Fix circular import
+    from security.dlp_handler import DLPHandler
+except ImportError:
+    DLPHandler = None # Placeholder if DLPHandler is not available
+    
 # Responsible for processing messages through various handlers
 
 class MessageHandler(ABC):
