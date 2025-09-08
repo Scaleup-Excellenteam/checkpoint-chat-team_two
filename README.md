@@ -52,7 +52,7 @@ To connect the Dockerized client to a server running on a different machine (e.g
     Run the `proxy_simple.ps1` script from PowerShell, replacing `TargetAddress` and `TargetPort` with your server's details. `ListenPort` is the local port the proxy will use.
 
     ```powershell
-    .\proxy_simple.ps1 -TargetAddress 172.20.10.11 -TargetPort 8090 -ListenPort 8099 -Action add
+    .\proxy_simple.ps1 -TargetAddress 172.20.10.13 -TargetPort 8080 -ListenPort 8099 -Action add
     ```
 
 2.  **Verify the proxy connection:**

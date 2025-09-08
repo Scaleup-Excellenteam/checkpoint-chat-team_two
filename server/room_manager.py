@@ -62,3 +62,18 @@ class RoomManager:
                 "member_count": len(self.rooms[room]),
                 "members": [getattr(c, "nick", "anon") for c in self.rooms[room]],
             }
+    
+    async def join(self, room: str, websocket: WebSocket):
+        """Add a client to a room"""
+        async with self.lock:
+            if room not in self.rooms:
+                self.rooms[room] = set()
+            self.rooms[room].add(websocket)
+    
+    async def leave(self, room: str, websocket: WebSocket):
+        """Remove a client from a room"""
+        async with self.lock:
+            if room in self.rooms:
+                self.rooms[room].discard(websocket)
+                if not self.rooms[room]:  # Remove empty rooms
+                    del self.rooms[room]

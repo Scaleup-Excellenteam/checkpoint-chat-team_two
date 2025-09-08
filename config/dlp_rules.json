@@ -1,21 +1,60 @@
 {
-  "rules": [
-    {
-      "id": "pii_ssn",
-      "pattern": "\\b\\d{3}-\\d{2}-\\d{4}\\b",
-      "category": "PII",
-      "action": "redact",
-      "replacement": "[REDACTED-SSN]"
-    },
-    {
-      "id": "secret_recipe",
-      "keywords": ["secret recipe", "confidential"],
-      "category": "CONFIDENTIAL",
-      "action": "block"
-    }
+  "recipe_keywords": [
+    "secret recipe",
+    "proprietary blend",
+    "confidential formula",
+    "trade secret",
+    "special ingredient",
+    "classified recipe",
+    "exclusive method",
+    "signature sauce",
+    "private recipe",
+    "internal formula",
+    "cooking technique",
+    "preparation method",
+    "ingredient ratio",
+    "temperature setting",
+    "cooking time",
+    "marination process",
+    "fermentation period",
+    "aging process",
+    "seasoning blend",
+    "spice mixture",
+    "flavor profile",
+    "texture enhancement",
+    "preservation method",
+    "storage conditions",
+    "shelf life",
+    "nutritional content",
+    "caloric value",
+    "dietary restrictions",
+    "allergen information",
+    "food safety",
+    "quality control",
+    "batch number",
+    "production date",
+    "expiration date",
+    "supplier information",
+    "pineapple"
   ],
-  "room_policies": {
-    "lobby": ["PII"],
-    "secret-ops": ["PII", "CONFIDENTIAL"]
+  "suspicious_indicators": [
+    "recipe", "ingredient", "cook", "bake", "mix", "blend", "sauce", "spice",
+    "temperature", "time", "process", "method", "technique", "formula",
+    "secret", "confidential", "proprietary", "special", "signature",
+    "preparation", "ferment", "age", "marinate", "season"
+  ],
+  "safe_patterns": [
+    "^(hi|hello|hey|good morning|good afternoon|good evening)",
+    "^(how are you|what's up|how's it going)",
+    "^(thanks|thank you|please|sorry)",
+    "^(yes|no|ok|okay|sure|maybe)",
+    "^(bye|goodbye|see you|talk later)",
+    "weather", "movie", "music", "sport", "game", "news"
+  ],
+  "gemini_config": {
+    "api_key": "AIzaSyAVYjlKonTb8bd2Rn8RLzrrGPBXTLkL4oY",
+    "model": "gemini-1.5-flash",
+    "api_url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent",
+    "prompt_template": "Analyze this chat message for sensitive recipe information, trade secrets, or confidential culinary data. Return only 'BLOCK' if it contains confidential information, otherwise 'ALLOW': {message}"
   }
 }

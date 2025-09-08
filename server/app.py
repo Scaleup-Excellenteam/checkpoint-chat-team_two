@@ -1,15 +1,18 @@
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from typing import Optional
+import json
 
 from config import settings
 from room_manager import RoomManager
 from logging_config import setup_logging
 
-# The message pipeline is optional — import if available, fail soft if not.
+# The message pipeline with DLP integration
 try:
-    from message_pipline import MessagePipeline, ValidationHandler, SecurityHandler  # noqa: F401
+    from message_pipline import MessagePipeline, ValidationHandler, DLPMessageHandler
+    from security.dlp_handler import DLPHandler
 except Exception:  # keep tests green even if pipeline module changes/missing
     MessagePipeline = None  # type: ignore
+    DLPHandler = None  # type: ignore
 
 
 class ChatServer:
@@ -24,13 +27,19 @@ class ChatServer:
         # loggers
         self.app_logger, self.security_logger = setup_logging()
 
-        # optional pipeline (keep flexible for Part 2)
+        # Initialize DLP pipeline
         self.pipeline: Optional[MessagePipeline] = None  # type: ignore[assignment]
         try:
-            if MessagePipeline is not None:
-                # If you later wire real handlers, do it here
-                self.pipeline = MessagePipeline([])
-        except Exception:
+            if MessagePipeline is not None and DLPHandler is not None:
+                dlp = DLPHandler("config/dlp_rules.json")
+                self.pipeline = MessagePipeline()
+                self.pipeline.handlers = [
+                    ValidationHandler(),
+                    DLPMessageHandler(dlp, use_gemini=True)  # Enable Gemini integration
+                ]
+                self.app_logger.info("DLP pipeline initialized successfully")
+        except Exception as e:
+            self.app_logger.error(f"Failed to initialize DLP pipeline: {e}")
             self.pipeline = None
 
         # room manager (pass pipeline if your RoomManager uses it)
@@ -82,10 +91,26 @@ class ChatServer:
                     continue
 
                 # ---- Real chat payload ----
-                message = text
-                # If you later add validation/DLP, run the pipeline here (non-blocking)
-                # if self.pipeline:
-                #     message = await self.pipeline.process(message)  # example
+                # Format message for pipeline: room|nick|text
+                raw_message = f"{room}|{websocket.nick}|{text}"
+                
+                # Process through DLP pipeline
+                if self.pipeline:
+                    try:
+                        processed_message = await self.pipeline.process(raw_message, websocket)
+                        if processed_message is None:
+                            # Message blocked by DLP
+                            await websocket.send_text("⚠️ Message blocked: Contains sensitive content")
+                            self.security_logger.warning(f"DLP blocked message from {websocket.nick}: {text}")
+                            continue
+                        # Extract processed text from pipeline result
+                        _, _, processed_text = processed_message.split("|", 2)
+                        message = processed_text
+                    except Exception as e:
+                        self.app_logger.error(f"Pipeline error: {e}")
+                        message = text  # Fallback to original message
+                else:
+                    message = text
 
                 await self.room_manager.broadcast(
                     room,
@@ -117,7 +142,18 @@ async def health():
     return {"status": "ok"}
 
 
-# Admin endpoints for Part 2 (stubs)
+# Admin endpoints for DLP management
 @app.post("/admin/dlp/reload")
 async def reload_dlp_rules():
-    return {"status": "not_implemented"}
+    """Reload DLP rules from configuration file"""
+    try:
+        if chat_server.pipeline and hasattr(chat_server.pipeline, 'handlers'):
+            for handler in chat_server.pipeline.handlers:
+                if hasattr(handler, 'dlp_handler'):
+                    # Reload DLP configuration
+                    with open("config/dlp_rules.json") as f:
+                        handler.dlp_handler.config = json.load(f)
+                    return {"status": "success", "message": "DLP rules reloaded"}
+        return {"status": "error", "message": "DLP not initialized"}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}

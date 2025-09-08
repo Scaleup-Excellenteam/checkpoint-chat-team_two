@@ -1,6 +1,6 @@
 # tests/test_chat.py
 from starlette.testclient import TestClient
-from app import app 
+from server.app import app 
 
 def test_two_clients_see_each_other():
     client = TestClient(app)

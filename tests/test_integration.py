@@ -1,7 +1,7 @@
 import pytest
 from fastapi.testclient import TestClient
-from app import app
-from message_pipline import MessagePipeline, ValidationHandler
+from server.app import app
+from server.message_pipline import MessagePipeline, ValidationHandler
 
 # Responsible for integration tests covering message pipeline and concurrent clients
 
