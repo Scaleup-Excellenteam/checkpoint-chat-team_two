@@ -2,13 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Optional, Dict, Any
 import re
 import json
-<<<<<<< HEAD
-    
-=======
-from security.dlp_handler import DLPHandler
-from security.url_filter import URLFilter
 
->>>>>>> 6bc87f7
 # Responsible for processing messages through various handlers
 
 class MessageHandler(ABC):
@@ -33,53 +27,6 @@ class ValidationHandler(MessageHandler):
         
         return message
 
-<<<<<<< HEAD
-=======
-class DLPMessageHandler(MessageHandler):
-    def __init__(self, dlp_handler: DLPHandler, use_gemini: bool = False):
-        self.dlp_handler = dlp_handler
-        self.use_gemini = use_gemini
-    
-    async def process(self, message, context):
-        if self.use_gemini:
-            processed_text, is_blocked = await self.dlp_handler.check_message_async(
-                message['text'], 
-                message['room']
-            )
-        else:
-            processed_text, is_blocked = self.dlp_handler.check_message(
-                message['text'], 
-                message['room']
-            )
-        
-        if is_blocked:
-            return None
-        
-        message['text'] = processed_text
-        return message
-
-class URLFilterHandler(MessageHandler):
-    def __init__(self, url_filter: URLFilter):
-        self.url_filter = url_filter
-    
-    async def process(self, message, context):
-        print(f"URLFilterHandler: Processing message from {message['nick']}: {message['text']}")
-        
-        processed_text, is_blocked = await self.url_filter.process_message_urls(
-            message['text'],
-            message['nick'],
-            message['room']
-        )
-        
-        if is_blocked:
-            print(f"URLFilterHandler: BLOCKED message from {message['nick']} due to malicious URL")
-            return None
-        
-        print(f"URLFilterHandler: ALLOWED message from {message['nick']}")
-        message['text'] = processed_text
-        return message
-
->>>>>>> 6bc87f7
 class MessagePipeline:
     def __init__(self):
         self.handlers = []

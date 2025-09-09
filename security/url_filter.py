@@ -5,6 +5,7 @@ import aiohttp
 import logging
 from typing import List, Dict, Optional, Tuple
 from datetime import datetime
+from message_pipline import MessageHandler
 
 # Responsible for URL filtering using VirusTotal and Klazify
 
@@ -55,6 +56,46 @@ class URLFilter:
         for domain in trusted_domains:
             if domain in url.lower():
                 return True
+        return False
+    
+    def is_blocked_domain(self, url: str) -> bool:
+        """Check if URL is from blocked domain"""
+        blocked_domains = self.config.get('url_filtering', {}).get('blocked_domains', [])
+        for domain in blocked_domains:
+            if domain in url.lower():
+                return True
+        return False
+    
+    def is_blocked_category(self, category: str, url: str) -> bool:
+        """Check if category or URL contains blocked keywords"""
+        blocked_categories = self.config.get('url_filtering', {}).get('blocked_categories', [])
+        blocked_keywords = self.config.get('url_filtering', {}).get('blocked_keywords', [])
+        
+        # Check category name
+        for blocked_cat in blocked_categories:
+            if blocked_cat.lower() in category.lower():
+                return True
+        
+        # Decode URL to handle Hebrew and other encoded characters
+        import urllib.parse
+        decoded_url = urllib.parse.unquote(url)
+        url_lower = url.lower()
+        
+        print(f"URLFilter: Checking URL keywords - Original: {url}")
+        print(f"URLFilter: Decoded URL: {decoded_url}")
+        
+        # Check URL for cooking/baking keywords (both original and decoded)
+        for blocked_cat in blocked_categories:
+            if blocked_cat.lower() in url_lower or blocked_cat.lower() in decoded_url.lower():
+                print(f"URLFilter: Found blocked category keyword '{blocked_cat}' in URL")
+                return True
+        
+        # Check specific blocked keywords (including Hebrew)
+        for keyword in blocked_keywords:
+            if keyword in decoded_url or keyword.lower() in url_lower:
+                print(f"URLFilter: Found blocked keyword '{keyword}' in URL")
+                return True
+        
         return False
     
     async def check_virustotal(self, url: str) -> Dict:
@@ -201,6 +242,15 @@ class URLFilter:
         
         for url in urls:
             print(f"URLFilter: Processing URL: {url}")
+            
+            # Check blocked domains first
+            if self.is_blocked_domain(url):
+                print(f"URLFilter: BLOCKING URL - blocked domain: {url}")
+                self.log_url_analysis(url, user, room, 
+                                    {"malicious": False, "positives": 0, "total": 0, "scan_date": "blocked_domain", "category": "Blocked Domain"}, 
+                                    "BLOCKED_DOMAIN")
+                return text, True
+            
             # Skip trusted domains but still categorize
             if self.is_trusted_domain(url):
                 category = self._guess_category_from_url(url)
@@ -218,11 +268,40 @@ class URLFilter:
             if vt_result.get('malicious', False):
                 # Block message if malicious URL found
                 print(f"URLFilter: BLOCKING message due to malicious URL: {url}")
-                self.log_url_analysis(url, user, room, vt_result, "BLOCKED")
+                self.log_url_analysis(url, user, room, vt_result, "BLOCKED_MALICIOUS")
                 return text, True
-            else:
-                # Log safe URL
-                print(f"URLFilter: ALLOWING URL: {url}, category: {vt_result.get('category', 'Unknown')}")
-                self.log_url_analysis(url, user, room, vt_result, "ALLOWED")
+            
+            # Check if category is blocked
+            category = vt_result.get('category', 'Unknown')
+            if self.is_blocked_category(category, url):
+                print(f"URLFilter: BLOCKING URL - blocked category '{category}': {url}")
+                self.log_url_analysis(url, user, room, vt_result, "BLOCKED_CATEGORY")
+                return text, True
+            
+            # Log safe URL
+            print(f"URLFilter: ALLOWING URL: {url}, category: {category}")
+            self.log_url_analysis(url, user, room, vt_result, "ALLOWED")
         
         return text, False
+    
+    
+class URLFilterHandler(MessageHandler):
+    def __init__(self, url_filter: URLFilter):
+        self.url_filter = url_filter
+    
+    async def process(self, message, context):
+        print(f"URLFilterHandler: Processing message from {message['nick']}: {message['text']}")
+        
+        processed_text, is_blocked = await self.url_filter.process_message_urls(
+            message['text'],
+            message['nick'],
+            message['room']
+        )
+        
+        if is_blocked:
+            print(f"URLFilterHandler: BLOCKED message from {message['nick']} due to malicious URL")
+            return None
+        
+        print(f"URLFilterHandler: ALLOWED message from {message['nick']}")
+        message['text'] = processed_text
+        return message

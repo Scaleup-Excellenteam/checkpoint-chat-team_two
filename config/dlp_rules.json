@@ -59,7 +59,15 @@
       "api_url": "https://www.virustotal.com/vtapi/v2/url/report",
       "malicious_threshold": 1
     },
-
+    "blocked_categories": [
+      "cooking", "baking", "recipe", "food", "culinary", "kitchen",
+      "chef", "restaurant", "dining", "cuisine", "meal", "dish"
+    ],
+    "blocked_domains": [
+      "allrecipes.com", "food.com", "epicurious.com", "foodnetwork.com",
+      "tasty.co", "delish.com", "bonappetit.com", "seriouseats.com",
+      "kingarthurbaking.com", "bettycrocker.com", "pillsbury.com","krutit.co.il"
+    ],
     "trusted_domains": [
       "youtube.com", "github.com", "stackoverflow.com", "google.com",
       "wikipedia.org", "reddit.com", "twitter.com", "facebook.com"
@@ -73,6 +81,6 @@
     "api_key": "AIzaSyAVYjlKonTb8bd2Rn8RLzrrGPBXTLkL4oY",
     "model": "gemini-1.5-flash",
     "api_url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent",
-    "prompt_template": "Analyze this chat message for sensitive recipe information, trade secrets, or confidential culinary data. Return only 'BLOCK' if it contains confidential information, otherwise 'ALLOW': {message}"
+    "prompt_template": "Analyze this chat message for sensitive recipe information, trade secrets, or confidential culinary data, or related to baking. Return only 'BLOCK' if it contains confidential information, otherwise 'ALLOW': {message}"
   }
 }

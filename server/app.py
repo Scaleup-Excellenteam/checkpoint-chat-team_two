@@ -14,14 +14,14 @@ from logging_config import setup_logging
 
 # The message pipeline with DLP and URL filtering integration
 try:
-    
+    from message_pipline import MessagePipeline, ValidationHandler
     from security.dlp_handler import DLPHandler, DLPMessageHandler
-    from message_pipline import MessagePipeline, ValidationHandler, DLPMessageHandler, URLFilterHandler
-    from security.url_filter import URLFilter
+    from security.url_filter import URLFilter, URLFilterHandler
 except Exception:  # keep tests green even if pipeline module changes/missing
     MessagePipeline = None  # type: ignore
     DLPHandler = None  # type: ignore
     URLFilter = None  # type: ignore
+    
 
 KNOWN_ROOMS: Set[str] = {"lobby"}
 # --- In-memory stores (POC only; replace with DB/JWT in real app) ---
