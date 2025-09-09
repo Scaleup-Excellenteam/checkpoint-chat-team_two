@@ -6,13 +6,20 @@ from config import settings
 from room_manager import RoomManager
 from logging_config import setup_logging
 
-# The message pipeline with DLP integration
+# The message pipeline with DLP and URL filtering integration
 try:
+<<<<<<< HEAD
     from message_pipline import MessagePipeline, ValidationHandler
     from security.dlp_handler import DLPHandler, DLPMessageHandler
+=======
+    from message_pipline import MessagePipeline, ValidationHandler, DLPMessageHandler, URLFilterHandler
+    from security.dlp_handler import DLPHandler
+    from security.url_filter import URLFilter
+>>>>>>> 6bc87f7
 except Exception:  # keep tests green even if pipeline module changes/missing
     MessagePipeline = None  # type: ignore
     DLPHandler = None  # type: ignore
+    URLFilter = None  # type: ignore
 
 
 class ChatServer:
@@ -27,19 +34,21 @@ class ChatServer:
         # loggers
         self.app_logger, self.security_logger = setup_logging()
 
-        # Initialize DLP pipeline
+        # Initialize DLP and URL filtering pipeline
         self.pipeline: Optional[MessagePipeline] = None  # type: ignore[assignment]
         try:
-            if MessagePipeline is not None and DLPHandler is not None:
+            if MessagePipeline is not None and DLPHandler is not None and URLFilter is not None:
                 dlp = DLPHandler("config/dlp_rules.json")
+                url_filter = URLFilter("config/dlp_rules.json")
                 self.pipeline = MessagePipeline()
                 self.pipeline.handlers = [
                     ValidationHandler(),
-                    DLPMessageHandler(dlp, use_gemini=True)  # Enable Gemini integration
+                    DLPMessageHandler(dlp, use_gemini=True),  # DLP with Gemini
+                    URLFilterHandler(url_filter)  # URL filtering
                 ]
-                self.app_logger.info("DLP pipeline initialized successfully")
+                self.app_logger.info("DLP and URL filtering pipeline initialized successfully")
         except Exception as e:
-            self.app_logger.error(f"Failed to initialize DLP pipeline: {e}")
+            self.app_logger.error(f"Failed to initialize pipeline: {e}")
             self.pipeline = None
 
         # room manager (pass pipeline if your RoomManager uses it)
@@ -94,22 +103,28 @@ class ChatServer:
                 # Format message for pipeline: room|nick|text
                 raw_message = f"{room}|{websocket.nick}|{text}"
                 
+                # Log incoming message for debugging
+                self.app_logger.info(f"Processing message: {raw_message}")
+                
                 # Process through DLP pipeline
                 if self.pipeline:
                     try:
                         processed_message = await self.pipeline.process(raw_message, websocket)
                         if processed_message is None:
-                            # Message blocked by DLP
+                            # Message blocked by DLP or URL filter
                             await websocket.send_text("⚠️ Message blocked: Contains sensitive content")
-                            self.security_logger.warning(f"DLP blocked message from {websocket.nick}: {text}")
+                            self.security_logger.warning(f"Message blocked from {websocket.nick}: {text}")
+                            self.app_logger.info(f"BLOCKED: {raw_message}")
                             continue
                         # Extract processed text from pipeline result
                         _, _, processed_text = processed_message.split("|", 2)
                         message = processed_text
+                        self.app_logger.info(f"ALLOWED: {raw_message}")
                     except Exception as e:
                         self.app_logger.error(f"Pipeline error: {e}")
                         message = text  # Fallback to original message
                 else:
+                    self.app_logger.info(f"No pipeline - using original message: {text}")
                     message = text
 
                 await self.room_manager.broadcast(

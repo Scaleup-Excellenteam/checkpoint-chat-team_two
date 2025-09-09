@@ -4,6 +4,7 @@ import pytest
 from contextlib import ExitStack
 from fastapi.testclient import TestClient
 
+<<<<<<< HEAD
 # App & pipeline
 from app import app
 from message_pipline import MessagePipeline, ValidationHandler
@@ -11,6 +12,11 @@ from message_pipline import MessagePipeline, ValidationHandler
 # Configurable delay (seconds) between messages in the sequential 20-clients test
 MESSAGE_DELAY_SECONDS = float(os.getenv("E2E_MSG_DELAY", "0.5"))
 
+=======
+# Configurable delay (seconds) between messages in the sequential 20-clients test
+MESSAGE_DELAY_SECONDS = float(os.getenv("E2E_MSG_DELAY", "0.05"))
+
+>>>>>>> 6bc87f7
 
 # ---------------------------
 # Helpers
@@ -220,4 +226,8 @@ def test_multiple_active_rooms_isolated_broadcast(client: TestClient, rooms: lis
 #   (3) Multiple active rooms with different clients (positive isolation)
 #
 # To speed up the slow test locally/CI:
+<<<<<<< HEAD
 #   E2E_MSG_DELAY=0.5 pytest -q
+=======
+#   E2E_MSG_DELAY=0.5 pytest -q
+>>>>>>> 6bc87f7
