@@ -8,18 +8,14 @@ from logging_config import setup_logging
 
 # The message pipeline with DLP and URL filtering integration
 try:
-<<<<<<< HEAD
     from message_pipline import MessagePipeline, ValidationHandler
     from security.dlp_handler import DLPHandler, DLPMessageHandler
-=======
-    from message_pipline import MessagePipeline, ValidationHandler, DLPMessageHandler, URLFilterHandler
-    from security.dlp_handler import DLPHandler
-    from security.url_filter import URLFilter
->>>>>>> 6bc87f7
+    from security.url_filter import URLFilter, URLFilterHandler
 except Exception:  # keep tests green even if pipeline module changes/missing
     MessagePipeline = None  # type: ignore
     DLPHandler = None  # type: ignore
     URLFilter = None  # type: ignore
+    
 
 
 class ChatServer:
