@@ -8,7 +8,47 @@
    pip install fastapi uvicorn websockets aiohttp pydantic-settings
    ```
 
-## Running the Server
+-----
+
+## Quick Start (Local Server)
+
+1.  **Build and run the server:**
+
+    ```bash
+    docker compose build --no-cache
+    docker compose up -d server
+    ```
+
+2.  **Verify server health:**
+
+    ```bash
+    curl http://localhost:8080/health
+    # Expected output: {"status":"healthy"}
+    ```
+
+3.  **Connect clients:**
+
+      * **Docker Client:**
+        ```bash
+        docker compose run --rm client
+        ```
+      * **Local Python Client:**
+        ```bash
+        poetry install
+        poetry run python client/client.py
+        ```
+
+    Messages sent from either client will appear in both terminals.
+
+-----
+
+## Connecting to an External Server (via Proxy)
+
+To connect the Dockerized client to a server running on a different machine (e.g., `172.20.10.11:8090`), a local proxy is used to forward requests.
+
+## Running Tests
+
+To run the project tests, ensure you have a `pytest.ini` file that sets the Python path correctly.
 
 ### Option 1: Direct Python (Recommended)
 ```bash
@@ -128,3 +168,8 @@ curl http://SERVER_IP:8080/health
 ```
 
 Should return: `{"status":"ok"}`
+
+docker compose down -v   
+docker compose up --build
+python client/interactive_client.py --url ws://localhost:8090/ws?username=Lior&room=lobby --nick Lior
+python -m http.server 3000

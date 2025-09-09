@@ -36,8 +36,8 @@
     "expiration date",
     "supplier information",
     "pineapple",
+    "backing",
     "bake"
-    
   ],
   "suspicious_indicators": [
     "recipe", "ingredient", "cook", "mix", "blend", "sauce", "spice",
