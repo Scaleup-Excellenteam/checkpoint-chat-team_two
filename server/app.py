@@ -6,13 +6,10 @@ from config import settings
 from room_manager import RoomManager
 from logging_config import setup_logging
 
-# The message pipeline with DLP integration
-try:
-    from message_pipline import MessagePipeline, ValidationHandler
-    from security.dlp_handler import DLPHandler, DLPMessageHandler
-except Exception:  # keep tests green even if pipeline module changes/missing
-    MessagePipeline = None  # type: ignore
-    DLPHandler = None  # type: ignore
+
+from message_pipline import MessagePipeline, ValidationHandler, URLFilterHandler
+from security.dlp_handler import DLPHandler, DLPMessageHandler
+from security.url_filter import URLFilter
 
 
 class ChatServer:
@@ -30,12 +27,14 @@ class ChatServer:
         # Initialize DLP pipeline
         self.pipeline: Optional[MessagePipeline] = None  # type: ignore[assignment]
         try:
-            if MessagePipeline is not None and DLPHandler is not None:
+            if MessagePipeline is not None and DLPHandler is not None and URLFilter is not None:
                 dlp = DLPHandler("config/dlp_rules.json")
+                url_filter = URLFilter("config/dlp_rules.json")
                 self.pipeline = MessagePipeline()
                 self.pipeline.handlers = [
                     ValidationHandler(),
-                    DLPMessageHandler(dlp, use_gemini=True)  # Enable Gemini integration
+                    DLPMessageHandler(dlp, use_gemini=True),  # Enable Gemini integration
+                    URLFilterHandler(url_filter)
                 ]
                 self.app_logger.info("DLP pipeline initialized successfully")
         except Exception as e:

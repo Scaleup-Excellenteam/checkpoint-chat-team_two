@@ -36,8 +36,8 @@
     "expiration date",
     "supplier information",
     "pineapple",
-    "bake"
-    
+    "bake",
+    "baking"
   ],
   "suspicious_indicators": [
     "recipe", "ingredient", "cook", "mix", "blend", "sauce", "spice",
@@ -53,6 +53,21 @@
     "^(bye|goodbye|see you|talk later)",
     "weather", "movie", "music", "sport", "game", "news"
   ],
+  "url_filtering": {
+    "virustotal": {
+      "api_key": "723f02b912b2558071c22142f738f9f935f1efdca41c2580fda474089530a2ab",
+      "api_url": "https://www.virustotal.com/vtapi/v2/url/report",
+      "malicious_threshold": 1
+    },
+    "trusted_domains": [
+      "youtube.com", "github.com", "stackoverflow.com", "google.com",
+      "wikipedia.org", "reddit.com", "twitter.com", "facebook.com"
+    ],
+    "logging": {
+      "enabled": true,
+      "log_file": "logs/url_analysis.log"
+    }
+  },
   "gemini_config": {
     "api_key": "AIzaSyAVYjlKonTb8bd2Rn8RLzrrGPBXTLkL4oY",
     "model": "gemini-1.5-flash",

@@ -14,11 +14,14 @@ class DLPHandler:
             
     def check_message(self, text: str, room: str) -> tuple[str, bool]:
         """Returns (processed_text, is_blocked)"""
+        print(f"DLPHandler: Checking message '{text}' for recipe keywords")
         # Quick keyword check first
         for keyword in self.config.get('recipe_keywords', []):
             if keyword.lower() in text.lower():
+                print(f"DLPHandler: FOUND keyword '{keyword}' in message - BLOCKING")
                 return text, True
         
+        print(f"DLPHandler: No recipe keywords found - ALLOWING")
         return text, False
     
     def _is_safe_message(self, text: str) -> bool:
@@ -49,9 +52,11 @@ class DLPHandler:
     
     async def check_message_async(self, text: str, room: str) -> tuple[str, bool]:
         """Async version with smart Gemini filtering"""
+        print(f"DLPHandler: Async checking message '{text}' for recipe keywords")
         # First check keywords (immediate block)
         for keyword in self.config.get('recipe_keywords', []):
             if keyword.lower() in text.lower():
+                print(f"DLPHandler: FOUND keyword '{keyword}' in message - BLOCKING")
                 return text, True
         
         # Check if message is clearly safe

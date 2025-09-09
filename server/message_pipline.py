@@ -27,6 +27,27 @@ class ValidationHandler(MessageHandler):
         
         return message
 
+class URLFilterHandler(MessageHandler):
+    def __init__(self, url_filter):
+        self.url_filter = url_filter
+    
+    async def process(self, message, context):
+        print(f"URLFilterHandler: Processing message from {message['nick']}: {message['text']}")
+        
+        processed_text, is_blocked = await self.url_filter.process_message_urls(
+            message['text'],
+            message['nick'],
+            message['room']
+        )
+        
+        if is_blocked:
+            print(f"URLFilterHandler: BLOCKED message from {message['nick']} due to malicious URL")
+            return None
+        
+        print(f"URLFilterHandler: ALLOWED message from {message['nick']}")
+        message['text'] = processed_text
+        return message
+
 class MessagePipeline:
     def __init__(self):
         self.handlers = []
