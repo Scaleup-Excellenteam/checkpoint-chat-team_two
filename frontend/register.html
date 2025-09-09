@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sign up</title>
+  <link rel="stylesheet" href="login.css" />
+</head>
+<body>
+  <div class="toast" id="toast"></div>
+
+  <main class="container">
+    <section class="card">
+      <header class="header">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <h1 class="h1">Create your account</h1>
+          <p class="muted">Join the team chat in seconds</p>
+        </div>
+      </header>
+
+      <!-- Register form -->
+      <form id="registerForm" class="form" novalidate>
+        <!-- Nickname (required by backend) -->
+        <div>
+          <label class="label" for="nickname">Nickname</label>
+          <input
+            class="input"
+            id="nickname"
+            name="nickname"
+            type="text"
+            placeholder="Your nickname"
+            minlength="2"
+            autocomplete="username"
+            required
+          />
+          <div class="helper" id="nicknameHelp"></div>
+        </div>
+
+        <!-- Full name (optional for backend; useful for UI) -->
+        <div>
+          <label class="label" for="fullname">Full name</label>
+          <input
+            class="input"
+            id="fullname"
+            name="fullname"
+            type="text"
+            placeholder="First Last"
+            autocomplete="name"
+            spellcheck="false"
+          />
+          <div class="helper" id="fullnameHelp"></div>
+        </div>
+
+        <!-- Email (optional for backend; can be used later) -->
+        <div>
+          <label class="label" for="email">Email</label>
+          <input
+            class="input"
+            id="email"
+            name="email"
+            type="email"
+            placeholder="name@example.com"
+            autocomplete="email"
+          />
+          <div class="helper" id="emailHelp"></div>
+        </div>
+
+        <!-- Password -->
+        <div>
+          <label class="label" for="password">Password</label>
+          <input
+            class="input"
+            id="password"
+            name="password"
+            type="password"
+            placeholder="••••••••"
+            minlength="4"
+            autocomplete="new-password"
+            required
+          />
+          <div class="helper" id="passwordHelp"></div>
+        </div>
+
+        <!-- Confirm password -->
+        <div>
+          <label class="label" for="password2">Confirm password</label>
+          <input
+            class="input"
+            id="password2"
+            name="password2"
+            type="password"
+            placeholder="••••••••"
+            minlength="4"
+            autocomplete="new-password"
+            required
+          />
+          <div class="helper" id="password2Help"></div>
+        </div>
+
+        <div class="row" style="align-items:center">
+          <label style="display:flex;gap:8px;align-items:center;font-size:14px">
+            <input id="terms" type="checkbox" />
+            <span>I agree to the Terms of Service</span>
+          </label>
+        </div>
+
+        <button type="submit" class="btn" id="registerBtn">Create account</button>
+
+        <div class="hr"></div>
+        <div class="helper">
+          Already have an account?
+          <a class="link" href="login.html">Sign in</a>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <!-- expose API base (override in config.js if you want) -->
+  <script>
+    window.API_BASE = window.API_BASE || "http://localhost:8090";
+  </script>
+  <!-- <script src="config.js"></script> -->
+  <script defer src="register.js"></script>
+</body>
+</html>

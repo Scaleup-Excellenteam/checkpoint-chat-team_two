@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Rooms</title>
+  <link rel="stylesheet" href="login.css" />
+  <style>
+    .list{ display:grid; gap:10px; margin-top:12px; }
+    .room{ display:flex; align-items:center; justify-content:space-between; padding:12px; border:1px solid var(--border); border-radius:12px; background:#fff; }
+    .row{ display:flex; gap:8px; align-items:center; }
+    .pill{ font-size:12px; color:var(--muted); background:#eef2f7; padding:4px 8px; border-radius:999px; }
+    .topbar{ display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+  </style>
+</head>
+<body>
+  <div class="toast" id="toast"></div>
+
+  <main class="container">
+    <section class="card">
+      <div class="topbar">
+        <div class="row">
+          <div class="logo" aria-hidden="true"></div>
+          <div>
+            <div class="h1" id="greet">Rooms</div>
+            <p class="muted">Choose a room to join or create a new one</p>
+          </div>
+        </div>
+        <div class="row">
+          <span class="pill" id="who"></span>
+          <button class="btn" id="logoutBtn" style="width:auto;padding-inline:14px">Logout</button>
+        </div>
+      </div>
+
+      <!-- Create room form -->
+      <form id="create-room-form" class="form" style="grid-template-columns: 1fr auto; display:grid; gap:8px">
+        <input class="input" id="room-name" placeholder="New room name" required />
+        <button class="btn" type="submit" style="width:auto">Create</button>
+      </form>
+
+      <div class="hr"></div>
+
+      <!-- Rooms list -->
+      <div class="list" id="rooms-list"></div>
+    </section>
+  </main>
+
+  <!-- Optional config before JS -->
+  <script>
+    // Override this via config.js if needed
+    window.API_BASE = window.API_BASE || "http://localhost:8090";
+  </script>
+  <!-- <script src="config.js"></script> -->
+  <script defer src="rooms.js"></script>
+</body>
+</html>
